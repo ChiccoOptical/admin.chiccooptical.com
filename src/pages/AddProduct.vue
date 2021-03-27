@@ -1,5 +1,5 @@
 <template>
-	<div class="bg-yellow-300 h-screen w-full p-6 px-10 flex flex-col">
+	<div class="bg-yellow-300 w-full p-6 px-10 flex flex-col">
 		<div id="numberList" class="flex flex-row items-center gap-x-2 mb-4">
 			<div class="numberbubble" :class="{used: step>=1 }">
 				<p>1</p>
@@ -31,7 +31,7 @@
 					<div class="grid grid-cols-5 gap-x-4">
 						<div class="col-span-2">
 							<h2>Product Type</h2>
-							<div id="brandRow" class="grid grid-cols-2">
+							<div id="choiceRow" class="grid grid-cols-2">
 								<input type="radio" name="productType" value="frames" id="frames" v-model="productType">
 								<label for="frames"><p>Frames</p></label>
 
@@ -41,7 +41,7 @@
 						</div>
 						<div class="col-span-3">
 							<h2>Gender/Age</h2>
-							<div id="brandRow" class="grid grid-cols-3">
+							<div id="choiceRow" class="grid grid-cols-3">
 								<input type="radio" name="genderAge" value="men" id="men" v-model="gender">
 								<label for="men"><p>Mens</p></label>
 
@@ -56,7 +56,7 @@
 
 					<!-- BRAND -->
 					<h2>Brand</h2>
-					<div id="brandRow" class="grid grid-cols-5">
+					<div id="choiceRow" class="grid grid-cols-5">
 						<input type="radio" name="brand" value="dior" id="dior" v-model="brandchoice">
 						<label for="dior"><p>Dior</p></label>
 
@@ -133,15 +133,35 @@
 				</div>
 				<div class="flex flex-row items-center mb-4" v-for="(colour, index) in frameColours" :key="index">
 					<div class="flex flex-row justify-between items-center w-full">
-						<multiselect v-model="frameColours[index]" :options="frameOptions"></multiselect>
+						<multiselect 
+							v-model="frameColours[index]"
+							:options="frameOptions"
+							tag-placeholder="Add this as new tag"
+							tag-position="bottom"
+						></multiselect>
 						<div>↔</div>
-						<multiselect v-model="lensColours[index]" :options="lensOptions"></multiselect>
+						<multiselect
+							v-model="lensColours[index]"
+							:options="lensOptions"
+							tag-placeholder="Add this as new tag"
+							tag-position="bottom"
+						></multiselect>
 					</div>
 					<svg @click="frameColours.splice(index, index+1);lensColours.splice(index, index+1)" class="w-6 h-6 ml-3" fill="#444444" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>
 				</div>
 				<div class="relative" @click="frameColours.push('');lensColours.push('')">
 					<svg class="w-10 h-10 relative rounded-full bg-yellow-300 cursor-pointer" style="left:10%;z-index:2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path></svg>
 					<hr class="border-black absolute w-full verticalCenter">
+				</div>
+				<h3>OR</h3>
+
+				<h2>Add New Colour</h2>
+				<div class="flex flex-col">
+
+					<input type="text" name="Colour Name" id="" class="p-4 focus:ring" placeholder="Colour name...">
+					<input type="radio" name="Frames" id="">
+					<input type="radio" name="Lenses" id="">
+					<input type="color" name="" id="">
 				</div>
 			</div>
 			<button class="py-2 px-6 text-2xl flex flex-row items-center" :disabled="!checkSecond" @click="next(2)"><p class="mr-3">Next</p><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg></button>
@@ -219,13 +239,11 @@ import Vue from "vue";
 import db from '@/firebase'
 import 'firebase/firestore'
 import 'firebase/storage'
-import router from '@/router';
-
 
 export default Vue.extend({
 	data(){
 		return{
-			step:1,
+			step:2,
 			file: {} as File,
 			uploadProgress:[] as number[],
 			frameOptions:[] as string[],
@@ -279,11 +297,16 @@ export default Vue.extend({
 				case 1:
 					if(this.title && this.model && this.description && this.size1 && this.size2 && this.imageURL && this.brandchoice){
 						this.step = 2;
+					}else{
+						alert("NOT ENOUGH VALUES")
 					}
 					break;
 				case 2:
 					if(this.checkSecond){
 						this.step = 3;
+					}
+					else{
+						alert("Choose More Colours")
 					}
 					break;
 				case 3:
@@ -360,6 +383,8 @@ export default Vue.extend({
 			})
 			db.storage().ref(this.productType + "/" + added.id + ".png").put(this.file)
 		},
+
+		//TODO Get this sorted out
 		resetValues(){
 
 		},
@@ -435,7 +460,7 @@ export default Vue.extend({
 	}
 
 	.dragover{
-		border: 9px solid #303030 !important;
+		border: 5px solid #303030 !important;
 	}
 
 	#lens p{
@@ -446,39 +471,47 @@ export default Vue.extend({
 		width: 2.5rem;
 		margin-right: 0.5rem;
 	}
-	#brandRow{
+	#choiceRow{
 		background:white;
 		border-radius: 0.4rem;
-		border: 2px solid #bbbbbb;
 		cursor: pointer;
 		overflow: hidden;
 	}
 
-	#brandRow input[type="radio"]{
+	#choiceRow input[type="radio"]{
 		display: none;
 	}
 
-	#brandRow label{
+	#choiceRow label{
 		cursor: pointer;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		padding: 0.3rem;
-		transition: .15s ease
+		transition: .15s ease;
+
+		-webkit-user-select: none; /* Safari */        
+		-moz-user-select: none; /* Firefox */
+		user-select: none; /* Standard */
 	}
-	#brandRow label:not(:nth-child(1)){
+
+	#choiceRow label:not(:nth-child(2)){
 		border-left: 1px solid #bbbbbb;
 	}
-	#brandRow label:not(:nth-child(5)){
+	#choiceRow label:not(:last-child){
 		border-right: 1px solid #bbbbbb;
 	}
-	#brandRow label p{
+
+	#choiceRow label p{
 		font-size: 1.2rem;
-		font-weight: 600;
+		font-weight: 400;
 	}
-	#brandRow input[type="radio"]:checked+label {
+	#choiceRow input[type="radio"]:checked+label {
 		background: black;
 		color: white;
+	}
+	#choiceRow input[type="radio"]:checked+label p{
+		font-weight: 600;
 	}
 
 	h2{

@@ -2,7 +2,7 @@
   <div
     class="w-full h-screen bg-green-300 p-6 pb-0 flex flex-col"
   >
-    <h1 class="text-5xl font-bold">Welcome, Jun</h1>
+    <h1 class="text-5xl font-bold mt-6">Welcome, Jun</h1>
 
     <div id="homeBody" class="grid grid-cols-5 gap-x-4 h-full">
       <div id="" class="col-span-3"></div>
